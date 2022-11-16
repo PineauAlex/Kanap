@@ -53,9 +53,14 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
 
 // Detection du 'clic' de la souris sur le bouton d'achat
 addButton.addEventListener('click', function() {
-    const productInfo = [{ id:productId, color:colorInput.value, quantity:quantityInput.value }];
+    const productInfo = localStorage.getItem("cart") != null ? getCart() : [] ;
+    productInfo.push({ id:productId, color:colorInput.value, quantity:quantityInput.value });
     const json = JSON.stringify(productInfo);
     localStorage.setItem("cart", json);
 })
 
+function getCart() {
+    const cart = localStorage.getItem("cart");
+    return JSON.parse(cart);
+}
 // findIndex
