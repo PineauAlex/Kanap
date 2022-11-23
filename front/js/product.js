@@ -53,14 +53,22 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
 
 // Detection du 'clic' de la souris sur le bouton d'achat
 addButton.addEventListener('click', function() {
-    const productInfo = localStorage.getItem("cart") != null ? getCart() : [] ;
-    productInfo.push({ id:productId, color:colorInput.value, quantity:quantityInput.value });
-    const json = JSON.stringify(productInfo);
-    localStorage.setItem("cart", json);
-})
+    // Récupère le panier si il y a des élèments
+    let cartProduct = [];
+    if (localStorage.getItem("cart") != null) {
+        cartProduct = JSON.parse(localStorage.getItem("cart"));
+    }
 
-function getCart() {
-    const cart = localStorage.getItem("cart");
-    return JSON.parse(cart);
-}
-// findIndex
+    // Rajoute un élement dans le panier ou augmente la quantité
+    let inCart = false;
+    for (let i = 0; i < cartProduct.length; i++) {
+        if (productId == cartProduct[i].id && colorInput.value == cartProduct[i].color) {
+            cartProduct[i].quantity = parseInt(cartProduct[i].quantity) + parseInt(quantityInput.value);
+            inCart = true;
+        }
+    }
+    if (!inCart) {
+        cartProduct.push({ id:productId, color:colorInput.value, quantity:quantityInput.value });
+    }
+    localStorage.setItem("cart", JSON.stringify(cartProduct));
+})
