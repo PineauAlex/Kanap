@@ -1,5 +1,6 @@
-// Endroit à changer pour afficher les produits
+// Les balises à récupérer pour changer la page
 const productList = document.getElementById("items");
+
 
 // Récupère les produits et les affichent
 fetch("http://localhost:3000/api/products", { method: 'GET' })

@@ -1,15 +1,15 @@
+// Valeurs
+let totalQuantity = 0;
+let totalPrice = 0;
+
+
 // Les balises à récupérer pour changer la page
 const cartList = document.getElementById("cart__items");
 const cartQuantity = document.getElementById("totalQuantity");
 const cartPrice = document.getElementById("totalPrice");
 
-const quantityInputs = document.getElementsByClassName("itemQuantity");
-const deleteButtons = document.getElementsByClassName("deleteItem");
 
-let totalQuantity = 0;
-let totalPrice = 0;
-
-// Récupère les produits
+// Récupère les produits et le panier pour afficher la liste
 fetch("http://localhost:3000/api/products", { method: 'GET' })
 .then(function(res) { // Tente de se connecter
     if (res.ok) {
@@ -55,13 +55,29 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
     console.log(err);
 });
 
-// Changement quantité d'un produit
-// for (quantityInputs)
-quantityInputs.addEventListener('change', function(event) {
-    const element = event.target;
-    console.log(element);
-})
+// Seulement à executer quand la fenêtre a fini de charger
+window.addEventListener('load', function () {
 
-// Suppression d'un produit
-deleteButtons.addEventListener('click', function() {
-})
+    // Balises des boutons/input ajoutés après le chargement de la page
+    const quantityInputs = document.getElementsByClassName("itemQuantity");
+    const deleteButtons = document.getElementsByClassName("deleteItem");
+
+
+    // Changement quantité d'un produit
+    for (i = 0; i < quantityInputs.length; i++) {
+        quantityInputs[i].addEventListener('change', function(event) {
+            const element = event.target;
+            console.log(element);
+        })
+    }
+
+
+    // Suppression d'un produit
+    for (i = 0; i < deleteButtons.length; i++) {
+        deleteButtons[i].addEventListener('click', function(event) {
+            const element = event.target;
+            console.log(element);
+        })
+    }
+
+});

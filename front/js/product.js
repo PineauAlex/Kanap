@@ -16,9 +16,11 @@ const quantityInput = document.getElementById("quantity");
 
 const addButton = document.getElementById("addToCart");
 
+
 // On récupère la valeur du produit choisit
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id')
+
 
 // Récupère les produits
 fetch("http://localhost:3000/api/products", { method: 'GET' })
@@ -50,6 +52,7 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
 .catch(function(err) { // Récupère l'erreur si le script ne fonctionne pas
     console.log(err);
 });
+
 
 // Detection du 'clic' de la souris sur le bouton d'achat
 addButton.addEventListener('click', function() {
