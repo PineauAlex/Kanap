@@ -17,12 +17,14 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
     }
 })
 .then(function(items) { // "items" = Les données récupérées. 
-    cart = JSON.parse(localStorage.getItem("cart"));
+    const cart = JSON.parse(localStorage.getItem("cart"));
 
     for (let i = 0; i < cart.length; i++) { // Affiche chaque produit
         const product = items.filter(product => product._id == cart[i].id);
         const productElement = document.createElement("article");
         productElement.setAttribute("class", "cart__item");
+        productElement.setAttribute("data-id", product[0]._id);
+        productElement.setAttribute("data-color", cart[i].color);
         productElement.innerHTML = `<div class="cart__item__img">
             <img src="${product[0].imageUrl}" alt="${product[0].altTxt}">
             </div>
@@ -35,7 +37,7 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
             <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
             <p>Qté : </p>
-            <input type="number" class="itemQuantity" name="${product[0]._id + "|" + cart[i].color}" min="1" max="100" value="${cart[i].quantity}">
+            <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${cart[i].quantity}">
             </div>
             <div class="cart__item__content__settings__delete">
             <p class="deleteItem">Supprimer</p>
@@ -66,7 +68,7 @@ window.addEventListener('load', function () {
     // Changement quantité d'un produit
     for (i = 0; i < quantityInputs.length; i++) {
         quantityInputs[i].addEventListener('change', function(event) {
-            const element = event.target;
+            const element = event.target.closest("article.cart__item");
             console.log(element);
         })
     }
@@ -75,8 +77,18 @@ window.addEventListener('load', function () {
     // Suppression d'un produit
     for (i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].addEventListener('click', function(event) {
-            const element = event.target;
-            console.log(element);
+            const element = event.target.closest("article.cart__item");
+            const id = element.dataset.id;
+            const color = element.dataset.color;
+            
+            let cart = JSON.parse(localStorage.getItem("cart"));
+            const product = cart.filter(product => id == product.id && color == product.color);
+            
+            const productIndex = cart.indexOf(product[0]);
+            cart.splice(productIndex, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            element.remove();
         })
     }
 
