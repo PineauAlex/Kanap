@@ -59,7 +59,7 @@ addButton.addEventListener('click', function() {
     // Récupère le panier si il y a des élèments
     let cartProduct = [];
     if (localStorage.getItem("cart") != null) {
-        cartProduct = JSON.parse(localStorage.getItem("cart"));
+        cartProduct = getCart();
     }
 
     // Rajoute un élement dans le panier ou augmente la quantité
@@ -73,5 +73,16 @@ addButton.addEventListener('click', function() {
     if (!inCart) {
         cartProduct.push({ id:productId, color:colorInput.value, quantity:quantityInput.value });
     }
-    localStorage.setItem("cart", JSON.stringify(cartProduct));
+    setCart(cartProduct);
 })
+
+
+// Récupère le panier en LocalStorage
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart"));
+}
+
+// Défini le panier dans le LocalStorage
+function setCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}

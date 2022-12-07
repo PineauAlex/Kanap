@@ -17,7 +17,7 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
     }
 })
 .then(function(items) { // "items" = Les données récupérées. 
-    const cart = JSON.parse(localStorage.getItem("cart"));
+    const cart = getCart();
 
     for (let i = 0; i < cart.length; i++) { // Affiche chaque produit
         const product = items.filter(product => product._id == cart[i].id);
@@ -50,12 +50,13 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
         totalPrice += (product[0].price * cart[i].quantity);
     }
 
-    cartQuantity.innerHTML = `${totalQuantity}`
-    cartPrice.innerHTML = `${totalPrice}`
+    setTotalQuantity(totalQuantity);
+    setTotalPrice(totalPrice);
 })
 .catch(function(err) { // Récupère l'erreur si le script ne fonctionne pas
     console.log(err);
 });
+
 
 // Seulement à executer quand la fenêtre a fini de charger
 window.addEventListener('load', function () {
@@ -63,7 +64,6 @@ window.addEventListener('load', function () {
     // Balises des boutons/input ajoutés après le chargement de la page
     const quantityInputs = document.getElementsByClassName("itemQuantity");
     const deleteButtons = document.getElementsByClassName("deleteItem");
-
 
     // Changement quantité d'un produit
     for (i = 0; i < quantityInputs.length; i++) {
@@ -73,7 +73,6 @@ window.addEventListener('load', function () {
         })
     }
 
-
     // Suppression d'un produit
     for (i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].addEventListener('click', function(event) {
@@ -81,15 +80,36 @@ window.addEventListener('load', function () {
             const id = element.dataset.id;
             const color = element.dataset.color;
             
-            let cart = JSON.parse(localStorage.getItem("cart"));
+            let cart = getCart();
             const product = cart.filter(product => id == product.id && color == product.color);
             
             const productIndex = cart.indexOf(product[0]);
             cart.splice(productIndex, 1);
-            localStorage.setItem("cart", JSON.stringify(cart));
+            setCart(cart);
 
             element.remove();
         })
     }
 
 });
+
+
+// Récupère le panier en LocalStorage
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart"));
+}
+
+// Défini le panier dans le LocalStorage
+function setCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+// Défini le prix total du panier
+function setTotalPrice(price) {
+    cartPrice.innerHTML = `${price}`
+}
+
+// Défini la quantité totale de produits dans le panier
+function setTotalQuantity(quantity) {
+    cartQuantity.innerHTML = `${quantity}`
+}
