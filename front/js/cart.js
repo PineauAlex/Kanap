@@ -69,7 +69,16 @@ window.addEventListener('load', function () {
     for (i = 0; i < quantityInputs.length; i++) {
         quantityInputs[i].addEventListener('change', function(event) {
             const element = event.target.closest("article.cart__item");
-            console.log(element);
+
+            const id = element.dataset.id;
+            const color = element.dataset.color;
+            let cart = getCart();
+
+            const product = cart.filter(product => id == product.id && color == product.color);
+            const productIndex = cart.indexOf(product[0]);
+            cart[productIndex].quantity = event.target.value;
+
+            setCart(cart);
         })
     }
 
@@ -77,12 +86,12 @@ window.addEventListener('load', function () {
     for (i = 0; i < deleteButtons.length; i++) {
         deleteButtons[i].addEventListener('click', function(event) {
             const element = event.target.closest("article.cart__item");
+
             const id = element.dataset.id;
             const color = element.dataset.color;
-            
             let cart = getCart();
+
             const product = cart.filter(product => id == product.id && color == product.color);
-            
             const productIndex = cart.indexOf(product[0]);
             cart.splice(productIndex, 1);
             setCart(cart);
