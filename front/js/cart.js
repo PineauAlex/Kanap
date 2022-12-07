@@ -1,24 +1,43 @@
-// Valeurs
-let totalQuantity = 0;
-let totalPrice = 0;
-
-
 // Les balises à récupérer pour changer la page
 const cartList = document.getElementById("cart__items");
 const cartQuantity = document.getElementById("totalQuantity");
 const cartPrice = document.getElementById("totalPrice");
 
-
-// Récupère les produits et le panier pour afficher la liste
-fetch("http://localhost:3000/api/products", { method: 'GET' })
-.then(function(res) { // Tente de se connecter
-    if (res.ok) {
-        return res.json();
-    }
-})
-.then(function(items) { // "items" = Les données récupérées. 
+// Fonction qui se lance au chargement de la page
+async function init() {
+    const products = await getProducts()
     const cart = getCart();
 
+    showCart(products, cart);
+    createEvents();
+
+    updateTotalQuantity(cart);
+    updateTotalPrice(cart, products);
+}
+
+// Récupère les produits sur l'API
+async function getProducts() {
+    try {
+        const products = await fetch("http://localhost:3000/api/products", { method: 'GET' })
+        return products.json();
+    }
+    catch(e) {
+        console.error(e);
+    }
+}
+
+// Récupère le panier en LocalStorage
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart"));
+}
+
+// Défini le panier dans le LocalStorage
+function setCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+// Affiche le panier sur la page HTML
+function showCart(items, cart) {
     for (let i = 0; i < cart.length; i++) { // Affiche chaque produit
         const product = items.filter(product => product._id == cart[i].id);
         const productElement = document.createElement("article");
@@ -45,21 +64,28 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
             </div>
             </div>`
         cartList.appendChild(productElement);
-
-        totalQuantity += parseInt(cart[i].quantity);
-        totalPrice += (product[0].price * cart[i].quantity);
     }
+}
 
-    setTotalQuantity(totalQuantity);
-    setTotalPrice(totalPrice);
-})
-.catch(function(err) { // Récupère l'erreur si le script ne fonctionne pas
-    console.log(err);
-});
+// Défini la quantité totale de produits dans le panier
+function updateTotalQuantity(cart) {
+    const totalQuantity = cart.reduce((accumulator, currentProduct) => accumulator + parseInt(currentProduct.quantity), 0);
+    cartQuantity.innerHTML = `${totalQuantity}`;
+}
 
+// Défini le prix total du panier
+function updateTotalPrice(cart, products) {
+    let productPrice = [];
+    for (let i = 0; i < cart.length; i++) {
+        const product = products.filter(product => product._id == cart[i].id);
+        productPrice.push(product[0].price * parseInt(cart[i].quantity));
+    }
+    const totalPrice = productPrice.reduce((accumulator, currentPrice) => accumulator + currentPrice, 0);
+    cartPrice.innerHTML = `${totalPrice}`
+}
 
-// Seulement à executer quand la fenêtre a fini de charger
-window.addEventListener('load', function () {
+// Crée les évènements sur les différents boutons
+function createEvents() {
 
     // Balises des boutons/input ajoutés après le chargement de la page
     const quantityInputs = document.getElementsByClassName("itemQuantity");
@@ -67,58 +93,46 @@ window.addEventListener('load', function () {
 
     // Changement quantité d'un produit
     for (i = 0; i < quantityInputs.length; i++) {
-        quantityInputs[i].addEventListener('change', function(event) {
+        quantityInputs[i].addEventListener('change', async function(event) {
             const element = event.target.closest("article.cart__item");
 
             const id = element.dataset.id;
             const color = element.dataset.color;
             let cart = getCart();
+            const products = await getProducts();
 
             const product = cart.filter(product => id == product.id && color == product.color);
             const productIndex = cart.indexOf(product[0]);
             cart[productIndex].quantity = event.target.value;
 
+            updateTotalQuantity(cart);
+            updateTotalPrice(cart, products);
             setCart(cart);
         })
     }
 
     // Suppression d'un produit
     for (i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].addEventListener('click', function(event) {
+        deleteButtons[i].addEventListener('click', async function(event) {
             const element = event.target.closest("article.cart__item");
 
             const id = element.dataset.id;
             const color = element.dataset.color;
             let cart = getCart();
+            const products = await getProducts();
 
             const product = cart.filter(product => id == product.id && color == product.color);
             const productIndex = cart.indexOf(product[0]);
             cart.splice(productIndex, 1);
+
+            updateTotalQuantity(cart);
+            updateTotalPrice(cart, products);
             setCart(cart);
 
             element.remove();
         })
     }
 
-});
-
-
-// Récupère le panier en LocalStorage
-function getCart() {
-    return JSON.parse(localStorage.getItem("cart"));
 }
 
-// Défini le panier dans le LocalStorage
-function setCart(cart) {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-// Défini le prix total du panier
-function setTotalPrice(price) {
-    cartPrice.innerHTML = `${price}`
-}
-
-// Défini la quantité totale de produits dans le panier
-function setTotalQuantity(quantity) {
-    cartQuantity.innerHTML = `${quantity}`
-}
+(async() => { await init() })();
