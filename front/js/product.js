@@ -19,7 +19,7 @@ const addButton = document.getElementById("addToCart");
 
 // On récupère la valeur du produit choisit
 const urlParams = new URLSearchParams(window.location.search);
-const productId = urlParams.get('id')
+const productId = urlParams.get('id');
 
 
 // Récupère les produits
