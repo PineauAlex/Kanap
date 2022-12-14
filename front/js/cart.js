@@ -3,6 +3,18 @@ const cartList = document.getElementById("cart__items");
 const cartQuantity = document.getElementById("totalQuantity");
 const cartPrice = document.getElementById("totalPrice");
 
+const formFirstName = document.getElementById("firstName");
+const formLastName = document.getElementById("lastName");
+const formAddress = document.getElementById("address");
+const formCity = document.getElementById("city");
+const formEmail = document.getElementById("email");
+
+const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+const addressErrorMsg = document.getElementById("addressErrorMsg");
+const cityErrorMsg = document.getElementById("cityErrorMsg");
+const emailErrorMsg = document.getElementById("emailErrorMsg");
+
 // Fonction qui se lance au chargement de la page
 async function init() {
     const products = await getProducts()
@@ -132,6 +144,56 @@ function createEvents() {
             element.remove();
         })
     }
+
+    formFirstName.addEventListener('input', function(event) {
+        const input = event.target.value;
+        if (/^([a-zA-Z]*)$/.test(input)) {
+            firstNameErrorMsg.innerHTML = ``;
+        }
+        else {
+            firstNameErrorMsg.innerHTML = `Veuillez indiquez un prénom correct !`;
+        }
+    });
+
+    formLastName.addEventListener('input', function(event) {
+        const input = event.target.value;
+        if (/^([a-zA-Z]*)$/.test(input)) {
+            lastNameErrorMsg.innerHTML = ``;
+        }
+        else {
+            lastNameErrorMsg.innerHTML = `Veuillez indiquez un nom correct !`;
+        }
+    });
+
+    formAddress.addEventListener('input', function(event) {
+        const input = event.target.value;
+        if (/^([a-zA-Z]*)$/.test(input)) {
+            addressErrorMsg.innerHTML = ``;
+        }
+        else {
+            addressErrorMsg.innerHTML = `Veuillez indiquez une adresse correcte !`;
+        }
+    });
+
+    formCity.addEventListener('input', function(event) {
+        const input = event.target.value;
+        if (/^([a-zA-Z]*)$/.test(input)) {
+            cityErrorMsg.innerHTML = ``;
+        }
+        else {
+            cityErrorMsg.innerHTML = `Veuillez indiquez une ville correcte !`;
+        }
+    });
+
+    formEmail.addEventListener('input', function(event) {
+        const input = event.target.value;
+        if (/^([a-z]*)@([a-z]*)$/.test(input)) {
+            emailErrorMsg.innerHTML = ``;
+        }
+        else {
+            emailErrorMsg.innerHTML = `Veuillez indiquez un email correct !`;
+        }
+    });
 
 }
 
