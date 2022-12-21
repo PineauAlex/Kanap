@@ -30,11 +30,15 @@ async function init() {
     const products = await getProducts()
     const cart = getCart();
 
-    showCart(products, cart);
-    createEvents();
+    if (cart != null) {
+        showCart(products, cart);
+        createEvents();
+    }
 
     updateTotalQuantity(cart);
     updateTotalPrice(cart, products);
+
+    orderForm.reset();
 }
 
 // Récupère les produits sur l'API
@@ -91,18 +95,30 @@ function showCart(items, cart) {
 
 // Défini la quantité totale de produits dans le panier
 function updateTotalQuantity(cart) {
-    const totalQuantity = cart.reduce((accumulator, currentProduct) => accumulator + parseInt(currentProduct.quantity), 0);
+    let totalQuantity;
+    if (cart == null) {
+        totalQuantity = 0;
+    }
+    else {
+        totalQuantity = cart.reduce((accumulator, currentProduct) => accumulator + parseInt(currentProduct.quantity), 0);
+    }
     cartQuantity.innerHTML = `${totalQuantity}`;
 }
 
 // Défini le prix total du panier
 function updateTotalPrice(cart, products) {
     let productPrice = [];
-    for (let i = 0; i < cart.length; i++) {
-        const product = products.filter(product => product._id == cart[i].id);
-        productPrice.push(product[0].price * parseInt(cart[i].quantity));
+    let totalPrice;
+    if (cart != null) {
+        for (let i = 0; i < cart.length; i++) {
+            const product = products.filter(product => product._id == cart[i].id);
+            productPrice.push(product[0].price * parseInt(cart[i].quantity));
+        }
+        totalPrice = productPrice.reduce((accumulator, currentPrice) => accumulator + currentPrice, 0);
     }
-    const totalPrice = productPrice.reduce((accumulator, currentPrice) => accumulator + currentPrice, 0);
+    else {
+        totalPrice = 0;
+    }
     cartPrice.innerHTML = `${totalPrice}`
 }
 
