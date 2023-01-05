@@ -1,20 +1,20 @@
 // Les balises à récupérer pour changer la page
-const titles = document.getElementsByTagName("title");
-const pageTitle = titles[0];
+const pageTitle = document.getElementsByTagName("title")[0];
 
 const productTitle = document.getElementById("title");
 const productDescription = document.getElementById("description");
 const productPrice = document.getElementById("price");
-
-const itemImages = document.getElementsByClassName("item__img");
-const productImage = itemImages[0];
+const productImage = document.getElementsByClassName("item__img")[0];
 
 const options = document.querySelector("#colors option");
 const colorInput = document.getElementById("colors");
-
 const quantityInput = document.getElementById("quantity");
 
 const addButton = document.getElementById("addToCart");
+const addButtonBox = document.getElementsByClassName("item__content__addButton")[0];
+
+const confirmation = document.createElement("p");
+addButtonBox.after(confirmation);
 
 
 // On récupère la valeur du produit choisit
@@ -23,31 +23,28 @@ const productId = urlParams.get('id');
 
 
 // Récupère les produits
-fetch("http://localhost:3000/api/products", { method: 'GET' })
+fetch("http://localhost:3000/api/products/" + productId, { method: 'GET' })
 .then(function(res) { // Tente de se connecter
     if (res.ok) {
         return res.json();
     }
 })
-.then(function(items) { // "items" = Les données récupérées. 
-    for (let i = 0; i < items.length; i++) { // Essaye chaque produit
-        if (productId == items[i]._id) { // Cherche lequel correspond au produit choisit
+.then(function(item) { // "item" = Le produit récupérée. 
 
-            // On applique les données sur la page
-            pageTitle.innerHTML = `${items[i].name}`;
-            productTitle.innerHTML = `${items[i].name}`;
-            productDescription.innerHTML = `${items[i].description}`;
-            productPrice.innerHTML = `${items[i].price}`;
-            productImage.innerHTML = `<img src="${items[i].imageUrl}" alt="${items[i].altTxt}">`;
+    // On applique les données sur la page
+    pageTitle.innerHTML = `${item.name}`;
+    productTitle.innerHTML = `${item.name}`;
+    productDescription.innerHTML = `${item.description}`;
+    productPrice.innerHTML = `${item.price}`;
+    productImage.innerHTML = `<img src="${item.imageUrl}" alt="${item.altTxt}">`;
 
-            for (let j = 0; j < items[i].colors.length; j++) { // Affiche chaque option de couleurs
-                const colorChoice = document.createElement("option");
-                colorChoice.setAttribute("value", items[i].colors[j]);
-                colorChoice.innerHTML = `${items[i].colors[j]}`;
-                options.after(colorChoice);
-            }
-        }
+    for (let i = 0; i < item.colors.length; i++) { // Affiche chaque option de couleurs
+        const colorChoice = document.createElement("option");
+        colorChoice.setAttribute("value", item.colors[i]);
+        colorChoice.innerHTML = `${item.colors[i]}`;
+        options.after(colorChoice);
     }
+
 })
 .catch(function(err) { // Récupère l'erreur si le script ne fonctionne pas
     console.log(err);
@@ -56,24 +53,35 @@ fetch("http://localhost:3000/api/products", { method: 'GET' })
 
 // Detection du 'clic' de la souris sur le bouton d'achat
 addButton.addEventListener('click', function() {
-    // Récupère le panier si il y a des élèments
-    let cartProduct = [];
-    if (localStorage.getItem("cart") != null) {
-        cartProduct = getCart();
+
+    // On regarde s'il y a une couleur et une quantité choisi
+    if (colorInput.value != "" && quantityInput.value > 0) {
+
+        // Récupère le panier si il y a des élèments
+        let cartProduct = [];
+        if (localStorage.getItem("cart") != null) {
+            cartProduct = getCart();
+        }
+
+        // Rajoute un élement dans le panier ou augmente la quantité
+        let inCart = false;
+        for (let i = 0; i < cartProduct.length; i++) {
+            if (productId == cartProduct[i].id && colorInput.value == cartProduct[i].color) {
+                cartProduct[i].quantity = parseInt(cartProduct[i].quantity) + parseInt(quantityInput.value);
+                inCart = true;
+            }
+        }
+        if (!inCart) {
+            cartProduct.push({ id:productId, color:colorInput.value, quantity:quantityInput.value });
+            confirmation.innerHTML = `Votre produit a bien été ajouté au panier.`;
+        }
+        else {
+            confirmation.innerHTML = `La quantité de votre produit a bien été augmentée.`;
+        }
+        setCart(cartProduct);
+
     }
 
-    // Rajoute un élement dans le panier ou augmente la quantité
-    let inCart = false;
-    for (let i = 0; i < cartProduct.length; i++) {
-        if (productId == cartProduct[i].id && colorInput.value == cartProduct[i].color) {
-            cartProduct[i].quantity = parseInt(cartProduct[i].quantity) + parseInt(quantityInput.value);
-            inCart = true;
-        }
-    }
-    if (!inCart) {
-        cartProduct.push({ id:productId, color:colorInput.value, quantity:quantityInput.value });
-    }
-    setCart(cartProduct);
 })
 
 

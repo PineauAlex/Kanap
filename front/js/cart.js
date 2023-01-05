@@ -17,13 +17,20 @@ const addressErrorMsg = document.getElementById("addressErrorMsg");
 const cityErrorMsg = document.getElementById("cityErrorMsg");
 const emailErrorMsg = document.getElementById("emailErrorMsg");
 
+const orderButton = document.getElementById("order");
+const orderButtonBox = document.getElementsByClassName("cart__order__form__submit")[0];
+
+const emptyCart = document.createElement("p");
+orderButtonBox.after(emptyCart);
+
+
+// Valeurs boolean pour le formulaire
 let firstNameIsValid = false;
 let lastNameIsValid = false;
 let addressIsValid = false;
 let cityIsValid = false;
 let emailIsValid = false;
 
-const orderButton = document.getElementById("order");
 
 // Fonction qui se lance au chargement de la page
 async function init() {
@@ -32,9 +39,10 @@ async function init() {
 
     if (cart != null) {
         showCart(products, cart);
-        createEvents();
+        createProductEvents();
     }
-
+    createFormEvents();
+    
     updateTotalQuantity(cart);
     updateTotalPrice(cart, products);
 
@@ -132,7 +140,7 @@ function updateOrderButton() {
 }
 
 // Crée les évènements sur les différents éléments
-function createEvents() {
+function createProductEvents() {
 
     // Balises des boutons/input ajoutés après le chargement de la page
     const quantityInputs = document.getElementsByClassName("itemQuantity");
@@ -155,6 +163,8 @@ function createEvents() {
             updateTotalQuantity(cart);
             updateTotalPrice(cart, products);
             setCart(cart);
+
+            updateOrderButton();
         })
     }
 
@@ -177,13 +187,20 @@ function createEvents() {
             setCart(cart);
 
             element.remove();
+
+            updateOrderButton();
         })
     }
+
+}
+
+// Crée les évènements pour le formulaire
+function createFormEvents() {
 
     // Formulaire
     formFirstName.addEventListener('input', function(event) {
         const input = event.target.value;
-        if (/^([a-zA-ZÀ-ÖØ-öø-ÿ]*)$/.test(input)) {
+        if (/^[a-zA-ZÀ-ÖØ-öø-ÿ]{2,}$/.test(input)) {
             firstNameErrorMsg.innerHTML = ``;
             firstNameIsValid = true;
         }
@@ -196,7 +213,7 @@ function createEvents() {
 
     formLastName.addEventListener('input', function(event) {
         const input = event.target.value;
-        if (/^([a-zA-ZÀ-ÖØ-öø-ÿ]*)$/.test(input)) {
+        if (/^[a-zA-ZÀ-ÖØ-öø-ÿ]{2,}$/.test(input)) {
             lastNameErrorMsg.innerHTML = ``;
             lastNameIsValid = true;
         }
@@ -235,7 +252,7 @@ function createEvents() {
 
     formEmail.addEventListener('input', function(event) {
         const input = event.target.value;
-        if (/^([a-zÀ-ÖØ-öø-ÿ]*)@([a-zÀ-ÖØ-öø-ÿ]*)$/.test(input)) {
+        if (/^([a-zÀ-ÖØ-öø-ÿ0-9]+)@([a-zÀ-ÖØ-öø-ÿ0-9]+)$/.test(input)) {
             emailErrorMsg.innerHTML = ``;
             emailIsValid = true;
         }
@@ -249,20 +266,29 @@ function createEvents() {
     orderForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
-        const contact = {
-            firstName: formFirstName.value,
-            lastName: formLastName.value,
-            address: formAddress.value,
-            city: formCity.value,
-            email: formEmail.value
-        };
-        const products = getCart().map(product => product.id);
+        const cart = getCart();
 
-        const order = await fetch("http://localhost:3000/api/products/order", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({contact, products}) })
-        const result = await order.json();
+        if (cart != null && cart.length > 0) {
+            emptyCart.innerHTML = ``;
 
-        const orderId = result.orderId;
-        window.location.replace("./confirmation.html?orderId=" + orderId);
+            const contact = {
+                firstName: formFirstName.value,
+                lastName: formLastName.value,
+                address: formAddress.value,
+                city: formCity.value,
+                email: formEmail.value
+            };
+            const products = getCart().map(product => product.id);
+
+            const order = await fetch("http://localhost:3000/api/products/order", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({contact, products}) })
+            const result = await order.json();
+
+            const orderId = result.orderId;
+            window.location.replace("./confirmation.html?orderId=" + orderId);
+        }
+        else {
+            emptyCart.innerHTML = `Votre panier est vide !`;
+        }
     });
 
 }

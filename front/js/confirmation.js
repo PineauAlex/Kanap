@@ -7,3 +7,6 @@ const orderId = urlParams.get('orderId');
 
 // Affichez ID
 orderIdMsg.innerHTML = `${orderId}`
+
+// Efface le LocalStorage
+localStorage.clear();
