@@ -226,7 +226,7 @@ function createFormEvents() {
 
     formAddress.addEventListener('input', function(event) {
         const input = event.target.value;
-        if (/^([0-9]*)([a-zA-ZÀ-ÖØ-öø-ÿ ]*)$/.test(input)) {
+        if (/^([0-9]*)([a-zA-ZÀ-ÖØ-öø-ÿ ]+)$/.test(input)) {
             addressErrorMsg.innerHTML = ``;
             addressIsValid = true;
         }
@@ -239,7 +239,7 @@ function createFormEvents() {
 
     formCity.addEventListener('input', function(event) {
         const input = event.target.value;
-        if (/^([a-zA-ZÀ-ÖØ-öø-ÿ ]*)$/.test(input)) {
+        if (/^([a-zA-ZÀ-ÖØ-öø-ÿ ]+)$/.test(input)) {
             cityErrorMsg.innerHTML = ``;
             cityIsValid = true;
         }
@@ -252,7 +252,7 @@ function createFormEvents() {
 
     formEmail.addEventListener('input', function(event) {
         const input = event.target.value;
-        if (/^([a-zÀ-ÖØ-öø-ÿ0-9]+)@([a-zÀ-ÖØ-öø-ÿ0-9]+)$/.test(input)) {
+        if (/^([a-zÀ-ÖØ-öø-ÿ0-9]+)@([a-zÀ-ÖØ-öø-ÿ0-9]+)\.([a-zÀ-ÖØ-öø-ÿ0-9]+)$/.test(input)) {
             emailErrorMsg.innerHTML = ``;
             emailIsValid = true;
         }

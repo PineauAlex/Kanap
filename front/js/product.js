@@ -81,6 +81,9 @@ addButton.addEventListener('click', function() {
         setCart(cartProduct);
 
     }
+    else {
+        confirmation.innerHTML = `Veuillez sélectionner une couleur et une quantité.`;
+    }
 
 })
 
